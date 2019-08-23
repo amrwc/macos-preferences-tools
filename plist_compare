@@ -1,0 +1,47 @@
+#!/usr/bin/env zsh
+
+# Compare plist domains from before and after a change was made.
+#
+# Usage:
+# ./plist_compare [domain_name] [diff_tool]
+
+source utils
+
+before="${PATH_PREFERENCES_BACKUP}/before"
+after="${PATH_PREFERENCES_BACKUP}/after"
+
+if [ -z ${1} ]; then
+	vared -p "What is the domain (the plist config file)? " -c domain_name
+	if [ -z ${domain_name} ]; then
+		println_colour red "No domain was specified; exiting."
+		exit 1
+	fi
+else
+	domain_name=${1}
+fi
+
+if [ -z ${2} ]; then
+	vared -p "What diff tool would you like to use? (${COLOUR_MAGENTA}diff${TEXT_RESET}/${COLOUR_MAGENTA}code${TEXT_RESET}): " -c diff_tool
+	if [ -z ${diff_tool} ]; then
+		println_colour red "No diff tool was specified; exiting."
+		exit 1
+	fi
+else
+	diff_tool=${2}
+fi
+
+plutil -convert xml1 -o /dev/stdout ${PATH_BEFORE}/${domain_name} > ${before}
+plutil -convert xml1 -o /dev/stdout ${PATH_AFTER}/${domain_name} > ${after}
+
+case ${diff_tool} in
+	(diff|DIFF|Diff|d|D)
+		diff ${before} ${after}
+	;;
+	(code|CODE|Code|c|C)
+		code --diff ${before} ${after}
+	;;
+	(*)
+		println_colour red "Diff tool name not recognised; exiting."
+		exit 1
+	;;
+esac

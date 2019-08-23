@@ -1,0 +1,43 @@
+#!/usr/bin/env zsh
+
+######################
+# CONSTANTS          #
+######################
+
+PATH_PREFERENCES_BACKUP="${HOME}/Downloads/__PREFERENCES_BACKUP"
+PATH_BEFORE="${PATH_PREFERENCES_BACKUP}/ALL_BEFORE"
+PATH_AFTER="${PATH_PREFERENCES_BACKUP}/ALL_AFTER"
+
+declare -A COLOURS=(
+	magenta $(tput setaf 5)
+	red $(tput setaf 1)
+)
+declare -A TXT_UTILS=(
+	reset $(tput sgr0)
+	underline $(tput smul)
+)
+
+######################
+# FUNCTIONS          #
+######################
+
+# @param colour {string}
+# @param text {string}
+# Usage:
+# print_colour <colour_name> <text_to_display>
+function print_colour() {
+	local colour=${COLOURS[${1}]}
+	if [ -z ${colour} ]; then
+		printf "${COLOURS[red]}Colour '${1}' is not recognised.${TXT_UTILS[reset]}\n"
+		exit 1
+	fi
+	printf "${colour}${2}${TXT_UTILS[reset]}"
+}
+
+# @param colour {string}
+# @param text {string}
+# Usage:
+# println_colour <colour_name> <text_to_display>
+function println_colour() {
+	print_colour ${1} "${2}\n"
+}

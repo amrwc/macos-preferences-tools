@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+
+# Compare preferences' before and after backups.
+#
+# Usage:
+# ./compare_full_backups [-r/--root]
+
+source utils
+
+case ${1} in
+	(-r|--root)
+		sudo diff -ur "${PATH_BEFORE}_ROOT" "${PATH_AFTER}_ROOT" | grep differ --color
+	;;
+	(*)
+		diff -ur ${PATH_BEFORE} ${PATH_AFTER} | grep differ --color
+	;;
+esac
