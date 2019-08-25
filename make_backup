@@ -1,29 +1,43 @@
 #!/usr/bin/env zsh
 
-# Make a backup of preferences before and after changes are made.
+# Make a backup of preferences before or after changes were made.
 #
 # Usage:
-# ./make_backup [before/after]
+# ./make_backup --before/--after [--root] [--help]
+# ./make_backup -b/-a [-r] [-h]
 
 source utils
 
-if [ -z ${1} ]; then
-	vared -p "Is it a backup (${COLOUR_MAGENTA}b${TEXT_RESET})efore or (${COLOUR_MAGENTA}a${TEXT_RESET})fter the change was made? (${COLOUR_MAGENTA}before${TEXT_RESET}/${COLOUR_MAGENTA}after${TEXT_RESET}): " -c before_or_after
-else
-	before_or_after=${1}
+before_or_after=""
+root=""
+
+for arg in ${@[@]}; do
+	case ${arg} in
+		(-b|--before)
+			before_or_after=${PATH_BEFORE}
+			;;
+		(-a|--after)
+			before_or_after=${PATH_AFTER}
+			;;
+		(-r|--root)
+			root="root"
+			;;
+		(-h|--help)
+			printf "Usage: ./make_backup --before/--after [--root]\n"
+			exit 0
+	esac
+done
+
+if [ -z ${before_or_after} ]; then
+	println_colour red "No option was chosen, therefore no backups were made."
+	println_colour red "Usage: ./make_backup --before/--after [--root]\n"
+	exit 1
 fi
 
-case ${before_or_after} in
-	b|B|before|Before|BEFORE )
-		destination=${PATH_BEFORE}
-	;;
-	a|A|after|After|AFTER )
-		destination=${PATH_AFTER}
-	;;
-	* )
-		println_colour red "No option was chosen, therefore no backups were made."
-		exit 1
-	;;
-esac
+destination="${before_or_after}"
 
-mkdir -p ${PATH_PREFERENCES_BACKUP} && cp -r ~/Library/Preferences/ ${destination}
+if [ -z ${root} ]; then
+	mkdir -p ${PATH_PREFERENCES_BACKUP} && cp -r ${PATH_PREFERENCES_USER} ${destination}
+else
+	mkdir -p ${PATH_PREFERENCES_BACKUP} && sudo cp -r ${PATH_PREFERENCES_ROOT} "${destination}_ROOT"
+fi
