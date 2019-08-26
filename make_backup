@@ -41,6 +41,7 @@ if [ -z ${root} ]; then
 	rm -rf ${destination}
 	mkdir -p ${PATH_PREFERENCES_BACKUP} && cp -r ${PATH_PREFERENCES_USER} ${destination}
 else
-	rm -rf "${destination}_ROOT"
+	sudo -v
+	sudo rm -rf "${destination}_ROOT"
 	mkdir -p ${PATH_PREFERENCES_BACKUP} && sudo cp -r ${PATH_PREFERENCES_ROOT} "${destination}_ROOT"
 fi
